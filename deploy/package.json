@@ -1,0 +1,16 @@
+{
+  "name": "bank-slip-reader",
+  "version": "1.0.0",
+  "description": "OCR-based bank slip reader application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "npm run serve"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "keywords": ["ocr", "bank", "slip", "reader", "react"],
+  "author": "Bank Slip Reader Team",
+  "license": "MIT"
+}

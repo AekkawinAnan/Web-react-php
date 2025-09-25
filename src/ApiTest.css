@@ -1,0 +1,284 @@
+.api-test-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.api-test-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.api-test-header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.api-test-header p {
+  margin: 0;
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.back-button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border: 1px solid #f5c6cb;
+  text-align: center;
+}
+
+.api-test-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.api-test-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.api-test-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.card-header h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+}
+
+.card-header code {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.card-actions {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.test-button {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.test-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.test-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.response-container {
+  margin-top: 1rem;
+  border-top: 2px solid #e9ecef;
+}
+
+.response-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.status-badge {
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.timestamp {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.json-response {
+  background: #2d3748;
+  color: #e2e8f0;
+  padding: 1.5rem;
+  margin: 0;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  max-height: 400px;
+  overflow-y: auto;
+  border-radius: 0 0 15px 15px;
+}
+
+.api-info {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem;
+}
+
+.api-info h3 {
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.endpoints-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.endpoint-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.endpoint-item code {
+  background: #e9ecef;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.endpoint-item span {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .api-test-container {
+    padding: 1rem;
+  }
+
+  .api-test-header h1 {
+    font-size: 2rem;
+  }
+
+  .api-test-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .api-test-card {
+    margin: 0;
+  }
+
+  .response-status {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .endpoint-item {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}
+
+/* Loading animation */
+.test-button:disabled {
+  position: relative;
+}
+
+.test-button:disabled::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: auto;
+  border: 2px solid transparent;
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Scrollbar styling for JSON response */
+.json-response::-webkit-scrollbar {
+  width: 8px;
+}
+
+.json-response::-webkit-scrollbar-track {
+  background: #1a202c;
+}
+
+.json-response::-webkit-scrollbar-thumb {
+  background: #4a5568;
+  border-radius: 4px;
+}
+
+.json-response::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}
