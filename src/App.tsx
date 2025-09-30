@@ -120,19 +120,15 @@ function App() {
           <div className="slip-info">
             <div className="info-row">
               <span className="label">Date:</span>
-              <span className="value">{slipData.date || 'Not found'}</span>
+              <span className="value">{slipData.Date || 'Not found'}</span>
             </div>
             <div className="info-row">
-              <span className="label">Time:</span>
-              <span className="value">{slipData.time || 'Not found'}</span>
+              <span className="label">To Account:</span>
+              <span className="value">{slipData.toAccount || 'Not found'}</span>
             </div>
             <div className="info-row">
-              <span className="label">From Account:</span>
-              <span className="value">{slipData.fromAccount || 'Not found'}</span>
-            </div>
-            <div className="info-row">
-              <span className="label">To/Biller:</span>
-              <span className="value">{slipData.biller || slipData.toAccount || 'Not found'}</span>
+              <span className="label">Biller:</span>
+              <span className="value">{slipData.biller || 'Not found'}</span>
             </div>
             <div className="info-row">
               <span className="label">Amount:</span>
