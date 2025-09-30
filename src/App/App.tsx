@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createWorker } from 'tesseract.js';
 import './App.css';
-import { getOcrUrl } from './config';
+import { getOcrUrl } from '../config';
 
 function App() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);

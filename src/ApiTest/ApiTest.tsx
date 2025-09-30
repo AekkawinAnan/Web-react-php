@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './ApiTest.css';
-import { API_CONFIG, getApiUrl } from './config';
+import { API_CONFIG, getApiUrl } from '../config';
 
 interface ApiResponse {
   status: string;
