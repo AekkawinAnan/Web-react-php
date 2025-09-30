@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createWorker } from 'tesseract.js';
 import './App.css';
+import { getOcrUrl } from './config';
 
 function App() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -42,7 +43,7 @@ function App() {
       setOcrText(text);
 
       // Send OCR text to API for parsing
-      const response = await fetch('http://localhost:8000/ocr.php', {
+      const response = await fetch(getOcrUrl(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

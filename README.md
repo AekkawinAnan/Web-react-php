@@ -164,9 +164,34 @@ export default defineConfig({
 })
 ```
 
-### Environment Variables
+### Configuration
 
-Create a `.env` file for configuration:
+The application uses central configuration files for easy environment management:
+
+#### Frontend Configuration (`src/config.ts`)
+```typescript
+export const API_CONFIG = {
+  BASE_URL: 'http://localhost:8000', // Change for different environments
+  ENDPOINTS: {
+    OCR: '/ocr.php',
+    TEST: '/api/test',
+    HEALTH: '/api/health'
+  }
+};
+```
+
+#### Deployment Configuration (`deploy/config.sh`)
+```bash
+# API base URL - change for different environments
+API_BASE_URL="https://readqrcode.iceiy.com"
+
+# Local development
+LOCAL_API_URL="http://localhost:8000"
+```
+
+#### Environment Variables (Optional)
+
+Create a `.env` file for additional configuration:
 
 ```env
 # Development
@@ -227,17 +252,6 @@ To use real OCR instead of mock data, see [OCR Setup Guide](api/OCR_SETUP.md) fo
 - OCR.space API configuration
 - AWS Textract implementation
 
-### Simple Hello World Testing
-For a simpler test, you can use the basic hello.php file:
-
-```bash
-# Start PHP server
-cd api
-php -S localhost:8000
-
-# Test the simple endpoint
-curl http://localhost:8000/hello.php
-```
 
 ### Manual API Testing
 If PHP is not available, you can test the API endpoints manually:

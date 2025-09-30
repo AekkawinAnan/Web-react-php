@@ -141,9 +141,7 @@ EOF
     # Copy API files to deployment
     mkdir -p deploy/api
     cp api/index.php deploy/api/
-    cp api/hello.php deploy/api/
     cp api/ocr.php deploy/api/
-    cp api/tesseract-test.php deploy/api/
     cp test-api.php deploy/
     cp .htaccess deploy/
     cp nginx.conf deploy/
@@ -217,10 +215,6 @@ echo "🧪 Testing Bank Slip Reader API"
 echo "================================"
 echo ""
 
-# Test hello world endpoint
-echo "1. Testing GET /api/hello.php"
-curl -s https://readqrcode.iceiy.com/api/hello.php | head -5
-echo ""
 echo "✅ Expected: JSON response with 'Hello World from Bank Slip Reader!'"
 echo ""
 
@@ -234,8 +228,9 @@ echo ""
 echo "🎉 API Testing Complete!"
 echo ""
 echo "📋 Available endpoints:"
-echo "   GET  /api/hello.php    - Simple hello world"
-echo "   GET  /api/index.php    - Full REST API"
+for endpoint in "${API_ENDPOINTS[@]}"; do
+    echo "   GET  $endpoint"
+done
 echo "   POST /api/verify-slip  - Slip verification"
 echo "   POST /api/parse-slip   - Slip parsing"
 EOF
@@ -551,7 +546,11 @@ EOF
     # Create combined startup script
     cat > deploy/start-all.sh << 'EOF'
 #!/bin/bash
-echo "🚀 Starting Bank Slip Reader (Frontend + Backend)"
+
+# Source configuration
+source deploy/config.sh
+
+echo "🚀 Starting $PROJECT_NAME (Frontend + Backend)"
 echo "================================================="
 echo ""
 echo "📱 Frontend (React App): http://localhost:3000"

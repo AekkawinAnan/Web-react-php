@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './ApiTest.css';
+import { API_CONFIG, getApiUrl } from './config';
 
 interface ApiResponse {
   status: string;
@@ -12,29 +13,32 @@ interface ApiResponse {
 
 const ApiTest: React.FC = () => {
   const [responses, setResponses] = useState<{[key: string]: ApiResponse | null}>({
-    hello: null,
     test: null,
     health: null,
-    root: null,
-    tesseract: null
+    root: null
   });
   const [loading, setLoading] = useState<{[key: string]: boolean}>({
-    hello: false,
     test: false,
     health: false,
-    root: false,
-    tesseract: false
+    root: false
   });
   const [error, setError] = useState<string | null>(null);
-
-  const API_BASE_URL = 'http://localhost:8000';
 
   const testEndpoint = async (endpoint: string, key: string) => {
     setLoading(prev => ({ ...prev, [key]: true }));
     setError(null);
 
     try {
-      const url = endpoint === 'root' ? `${API_BASE_URL}/` : `${API_BASE_URL}/${endpoint}`;
+      let url: string;
+      if (endpoint === 'root') {
+        url = getApiUrl('');
+      } else if (endpoint === 'test') {
+        url = getApiUrl(API_CONFIG.ENDPOINTS.TEST);
+      } else if (endpoint === 'health') {
+        url = getApiUrl(API_CONFIG.ENDPOINTS.HEALTH);
+      } else {
+        url = getApiUrl(endpoint);
+      }
       const response = await fetch(url, {
         method: endpoint === 'root' ? 'GET' : 'GET',
         headers: {
@@ -90,36 +94,6 @@ const ApiTest: React.FC = () => {
       )}
 
       <div className="api-test-grid">
-        {/* Hello World Test */}
-        <div className="api-test-card">
-          <div className="card-header">
-            <h3>🌟 Simple Hello World</h3>
-            <code>GET /api/hello.php</code>
-          </div>
-          <div className="card-actions">
-            <button
-              onClick={() => testEndpoint('hello.php', 'hello')}
-              disabled={loading.hello}
-              className="test-button"
-            >
-              {loading.hello ? 'Testing...' : 'Test API'}
-            </button>
-          </div>
-          {responses.hello && (
-            <div className="response-container">
-              <div className="response-status">
-                <span
-                  className="status-badge"
-                  style={{ backgroundColor: getStatusColor(responses.hello.status) }}
-                >
-                  {responses.hello.status}
-                </span>
-                <span className="timestamp">{responses.hello.timestamp}</span>
-              </div>
-              <pre className="json-response">{formatJson(responses.hello)}</pre>
-            </div>
-          )}
-        </div>
 
         {/* API Test */}
         <div className="api-test-card">
@@ -214,45 +188,11 @@ const ApiTest: React.FC = () => {
           )}
         </div>
 
-        {/* Tesseract Test */}
-        <div className="api-test-card">
-          <div className="card-header">
-            <h3>🔍 Tesseract OCR Test</h3>
-            <code>GET /api/tesseract-test.php</code>
-          </div>
-          <div className="card-actions">
-            <button
-              onClick={() => testEndpoint('tesseract-test.php', 'tesseract')}
-              disabled={loading.tesseract}
-              className="test-button"
-            >
-              {loading.tesseract ? 'Testing...' : 'Test OCR'}
-            </button>
-          </div>
-          {responses.tesseract && (
-            <div className="response-container">
-              <div className="response-status">
-                <span
-                  className="status-badge"
-                  style={{ backgroundColor: getStatusColor(responses.tesseract.status) }}
-                >
-                  {responses.tesseract.data?.tesseract_status === 'working' ? 'Working' : 'Not Available'}
-                </span>
-                <span className="timestamp">{responses.tesseract.timestamp}</span>
-              </div>
-              <pre className="json-response">{formatJson(responses.tesseract)}</pre>
-            </div>
-          )}
-        </div>
       </div>
 
       <div className="api-info">
         <h3>📊 API Endpoints Available:</h3>
         <div className="endpoints-list">
-          <div className="endpoint-item">
-            <code>GET /api/hello.php</code>
-            <span>Simple hello world endpoint</span>
-          </div>
           <div className="endpoint-item">
             <code>GET /api/test</code>
             <span>REST API test endpoint</span>
@@ -272,10 +212,6 @@ const ApiTest: React.FC = () => {
           <div className="endpoint-item">
             <code>POST /api/parse-slip</code>
             <span>Slip parsing (placeholder)</span>
-          </div>
-          <div className="endpoint-item">
-            <code>GET /api/tesseract-test.php</code>
-            <span>Test Tesseract OCR installation</span>
           </div>
         </div>
       </div>

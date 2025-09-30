@@ -127,16 +127,6 @@ try {
             }
             break;
 
-        case 'tesseract-test':
-            // GET /api/tesseract-test - Test Tesseract OCR installation
-            if ($request_method === 'GET') {
-                // Include the Tesseract test logic
-                require_once 'tesseract-test.php';
-                exit(); // Exit to prevent further processing
-            } else {
-                throw new Exception('Method not allowed. Use GET.', 405);
-            }
-            break;
 
         default:
             // Root endpoint or 404
