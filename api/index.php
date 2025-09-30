@@ -21,6 +21,8 @@ $path = $uri_parts[0];
 // Remove leading slash and split path
 $path_parts = explode('/', trim($path, '/'));
 $endpoint = $path_parts[0] ?? '';
+// Remove .php extension if present
+$endpoint = preg_replace('/\.php$/', '', $endpoint);
 
 try {
     switch ($endpoint) {
@@ -92,7 +94,7 @@ try {
                 http_response_code(200);
                 echo json_encode($response, JSON_PRETTY_PRINT);
             } else {
-                throw new Exception('Method not allowed. Use POST.', 405);
+                throw new Exception('Method not allowed - test. Use POST.', 405);
             }
             break;
 

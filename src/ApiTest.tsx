@@ -27,7 +27,7 @@ const ApiTest: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
 
-  const API_BASE_URL = 'https://readqrcode.iceiy.com/api';
+  const API_BASE_URL = 'http://localhost:8000';
 
   const testEndpoint = async (endpoint: string, key: string) => {
     setLoading(prev => ({ ...prev, [key]: true }));

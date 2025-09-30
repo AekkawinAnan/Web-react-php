@@ -17,12 +17,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-try {
-    // Check if this is a POST request with text input
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        throw new Exception('Only POST method allowed', 405);
-    }
+// Handle GET requests for API information
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $response = [
+        'status' => 'success',
+        'message' => 'Bank Slip Reader API',
+        'timestamp' => date('Y-m-d H:i:s'),
+        'version' => '1.0.0',
+        'description' => 'Backend API for Bank Slip Reader application',
+        'endpoints' => [
+            'GET /api/test' => 'Test endpoint - returns hello world',
+            'GET /api/health' => 'Health check endpoint',
+            'POST /api/verify-slip' => 'Verify slip data (JSON input)',
+            'POST /api/parse-slip' => 'Parse slip image (multipart/form-data)',
+            'POST /api/ocr' => 'Process image with OCR and extract slip data'
+        ],
+        'documentation' => 'See README.md for full API documentation'
+    ];
+    http_response_code(200);
+    echo json_encode($response, JSON_PRETTY_PRINT);
+    exit();
+}
 
+try {
     // Get raw input data
     $input = file_get_contents('php://input');
     $requestData = json_decode($input, true);
@@ -33,7 +50,7 @@ try {
     } elseif (isset($_POST['ocr_text'])) {
         $ocrText = $_POST['ocr_text'];
     } else {
-        throw new Exception('No OCR text provided. Please provide ocr_text in JSON body or form data', 400);
+        throw new Exception('No OCR text provided - test. Please provide ocr_text in JSON body or form data', 400);
     }
 
     // Validate OCR text
@@ -311,9 +328,11 @@ function parseSlipFromText($text) {
     // Clean and normalize the text
     $cleanText = trim($text);
 
-    // Date patterns (support both BE and AD years)
-    $datePattern1 = '/(\d{1,2})\s*(ม\.ค\.|ก\.พ\.|มี\.ค\.|เม\.ย\.|พ\.ค\.|มิ\.ย\.|ก\.ค\.|ส\.ค\.|ก\.ย\.|ต\.ค\.|พ\.ย\.|ธ\.ค\.)\s*(\d{4})/i';
-    $datePattern2 = '/(\d{1,2})\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s*(\d{4})/i';
+    // Date patterns (support both BE and AD years, 2 or 4 digit years)
+    $datePattern1 = '/(\d{1,2})\s*(ม\.ค\.|ก\.พ\.|มี\.ค\.|เม\.ย\.|พ\.ค\.|มิ\.ย\.|ก\.ค\.|ส\.ค\.|ก\.ย\.|ก\.ข\.|ต\.ค\.|พ\.ย\.|ธ\.ค\.)\s*(\d{2,4})/i';
+    $datePattern2 = '/(\d{1,2})\s*(ม\.ค\.|ก\.พ\.|มี\.ค\.|เม\.ย\.|พ\.ค\.|มิ\.ย\.|ก\.ค\.|ส\.ค\.|ก\.ย\.|ก\.ข\.|ต\.ค\.|พ\.ย\.|ธ\.ค\.)\s*(\d{4})/i';
+    $datePattern3 = '/(\d{1,2})\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s*(\d{2,4})/i';
+    $datePattern4 = '/(\d{1,2})\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s*(\d{4})/i';
     $timePattern = '/(\d{1,2}):(\d{2})/';
 
     // Account number patterns (multiple formats)
@@ -326,6 +345,7 @@ function parseSlipFromText($text) {
     $amountPattern1 = '/(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*บาท/i';
     $amountPattern2 = '/(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*THB/i';
     $amountPattern3 = '/จำนวนเงิน\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/i';
+    $amountPattern4 = '/จํานวนเงิน\s+(\d+(?:\.\d{2})?)/i';
 
     // Reference number patterns (various lengths)
     $refPattern1 = '/รหัสอ้างอิง[:\s]*([A-Za-z0-9]{10,})/i';
@@ -341,12 +361,24 @@ function parseSlipFromText($text) {
     $billerIdPattern = '/Biller ID[:\s]*(\d+)/i';
     $serviceCodePattern = '/รหัสบริการ[:\s]*([A-Za-z0-9]+)/i';
 
+    // Sender and receiver name patterns
+    $senderPattern1 = '/จาก[:\s]*([^\n\r]+)/i';
+    $senderPattern2 = '/ผู้ส่ง[:\s]*([^\n\r]+)/i';
+    $receiverPattern1 = '/ไปยัง[:\s]*([^\n\r]+)/i';
+    $receiverPattern2 = '/ผู้รับ[:\s]*([^\n\r]+)/i';
+    $receiverPattern3 = '/ถึง[:\s]*([^\n\r]+)/i';
+
+    // Transaction type patterns
+    $transactionTypePattern = '/(โอน|ชำระ|จ่าย|ถอน|ฝาก|Transfer|Payment|Withdraw|Deposit)/i';
+
     // Bank name patterns
     $bankNamePattern = '/(SCB|ธนาคารไทยพาณิชย์|กสิกรไทย|KBANK|BBL|KTB|TBANK|UOB|ธนาคารกรุงเทพ|ธนาคารกรุงไทย|ธนาคารทหารไทย|ธนาคารยูโอบี)/i';
 
     // Find all matches
     $dateMatch1 = preg_match($datePattern1, $cleanText, $dateMatches1) ? $dateMatches1 : null;
     $dateMatch2 = preg_match($datePattern2, $cleanText, $dateMatches2) ? $dateMatches2 : null;
+    $dateMatch3 = preg_match($datePattern3, $cleanText, $dateMatches3) ? $dateMatches3 : null;
+    $dateMatch4 = preg_match($datePattern4, $cleanText, $dateMatches4) ? $dateMatches4 : null;
     $timeMatch = preg_match($timePattern, $cleanText, $timeMatches) ? $timeMatches : null;
 
     preg_match_all($accountPattern1, $cleanText, $accounts1);
@@ -358,6 +390,7 @@ function parseSlipFromText($text) {
     $amountMatch1 = preg_match($amountPattern1, $cleanText, $amountMatches1) ? $amountMatches1 : null;
     $amountMatch2 = preg_match($amountPattern2, $cleanText, $amountMatches2) ? $amountMatches2 : null;
     $amountMatch3 = preg_match($amountPattern3, $cleanText, $amountMatches3) ? $amountMatches3 : null;
+    $amountMatch4 = preg_match($amountPattern4, $cleanText, $amountMatches4) ? $amountMatches4 : null;
 
     $refMatch1 = preg_match($refPattern1, $cleanText, $refMatches1) ? $refMatches1 : null;
     $refMatch2 = preg_match($refPattern2, $cleanText, $refMatches2) ? $refMatches2 : null;
@@ -371,19 +404,39 @@ function parseSlipFromText($text) {
     $billerIdMatch = preg_match($billerIdPattern, $cleanText, $billerIdMatches) ? $billerIdMatches : null;
     $serviceCodeMatch = preg_match($serviceCodePattern, $cleanText, $serviceCodeMatches) ? $serviceCodeMatches : null;
 
+    $senderMatch1 = preg_match($senderPattern1, $cleanText, $senderMatches1) ? $senderMatches1 : null;
+    $senderMatch2 = preg_match($senderPattern2, $cleanText, $senderMatches2) ? $senderMatches2 : null;
+    $receiverMatch1 = preg_match($receiverPattern1, $cleanText, $receiverMatches1) ? $receiverMatches1 : null;
+    $receiverMatch2 = preg_match($receiverPattern2, $cleanText, $receiverMatches2) ? $receiverMatches2 : null;
+    $receiverMatch3 = preg_match($receiverPattern3, $cleanText, $receiverMatches3) ? $receiverMatches3 : null;
+
+    $transactionTypeMatch = preg_match($transactionTypePattern, $cleanText, $transactionTypeMatches) ? $transactionTypeMatches : null;
+
     $bankNameMatch = preg_match($bankNamePattern, $cleanText, $bankNameMatches) ? $bankNameMatches : null;
 
     // Determine best date match
-    $dateMatch = $dateMatch1 ?: $dateMatch2;
+    $dateMatch = $dateMatch1 ?: $dateMatch2 ?: $dateMatch3 ?: $dateMatch4;
     $date = null;
     if ($dateMatch) {
-        if (isset($dateMatch[2]) && strlen($dateMatch[2]) > 3) {
-            // Thai month name
-            $date = sprintf('%s %s %s', $dateMatch[1], $dateMatch[2], $dateMatch[3]);
-        } else {
-            // English month name
-            $date = sprintf('%s %s %s', $dateMatch[1], $dateMatch[2], $dateMatch[3]);
+        $day = $dateMatch[1];
+        $month = $dateMatch[2];
+        $year = $dateMatch[3];
+
+        // Convert 2-digit year to 4-digit
+        if (strlen($year) == 2) {
+            if (preg_match('/ม\.ค\.|ก\.พ\.|มี\.ค\.|เม\.ย\.|พ\.ค\.|มิ\.ย\.|ก\.ค\.|ส\.ค\.|ก\.ย\.|ต\.ค\.|พ\.ย\.|ธ\.ค\./i', $month)) {
+                // Thai month, assume BE
+                $year = '25' . $year;
+            } else {
+                // English month, assume AD
+                $year = '20' . $year;
+            }
         }
+
+        // Normalize month abbreviations
+        $month = str_replace('ก.ข.', 'ก.ย.', $month);
+
+        $date = sprintf('%s %s %s', $day, $month, $year);
     }
 
     // Determine best amount match
@@ -394,6 +447,8 @@ function parseSlipFromText($text) {
         $amount = floatval(str_replace(',', '', $amountMatch2[1]));
     } elseif ($amountMatch3) {
         $amount = floatval(str_replace(',', '', $amountMatch3[1]));
+    } elseif ($amountMatch4) {
+        $amount = floatval(str_replace(',', '', $amountMatch4[1]));
     }
 
     // Determine best reference match
@@ -410,18 +465,36 @@ function parseSlipFromText($text) {
     elseif ($billerMatch2) $biller = trim($billerMatch2[1]);
     elseif ($billerMatch3) $biller = trim($billerMatch3[1]);
 
+    // Determine sender name
+    $sender = null;
+    if ($senderMatch1) $sender = trim($senderMatch1[1]);
+    elseif ($senderMatch2) $sender = trim($senderMatch2[1]);
+
+    // Determine receiver name
+    $receiver = null;
+    if ($receiverMatch1) $receiver = trim($receiverMatch1[1]);
+    elseif ($receiverMatch2) $receiver = trim($receiverMatch2[1]);
+    elseif ($receiverMatch3) $receiver = trim($receiverMatch3[1]);
+
+    // Determine transaction type
+    $transactionType = null;
+    if ($transactionTypeMatch) {
+        $type = trim($transactionTypeMatch[1]);
+        // Normalize to English
+        if (preg_match('/โอน|Transfer/i', $type)) $transactionType = 'Transfer';
+        elseif (preg_match('/ชำระ|จ่าย|Payment/i', $type)) $transactionType = 'Payment';
+        elseif (preg_match('/ถอน|Withdraw/i', $type)) $transactionType = 'Withdraw';
+        elseif (preg_match('/ฝาก|Deposit/i', $type)) $transactionType = 'Deposit';
+        else $transactionType = $type;
+    }
+
     return [
         'date' => $date,
         'time' => $timeMatch ? sprintf('%s:%s', $timeMatch[1], $timeMatch[2]) : null,
         'fromAccount' => $allAccounts[0] ?? null,
         'toAccount' => $allAccounts[1] ?? null,
-        'amount' => $amount,
-        'reference' => $reference,
         'biller' => $biller,
-        'billerId' => $billerIdMatch ? $billerIdMatch[1] : null,
-        'serviceCode' => $serviceCodeMatch ? $serviceCodeMatch[1] : null,
-        'bankName' => $bankNameMatch ? $bankNameMatch[1] : null,
-        'rawText' => $cleanText
+        'amount' => $amount
     ];
 }
 ?>
